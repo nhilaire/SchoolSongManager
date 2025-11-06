@@ -419,3 +419,4 @@ FodyWeavers.xsd
 /backend/CORS-CONFIGURATION.md
 /frontend/school-song-manager-ui/.vscode
 /frontend/school-song-manager-ui/package-lock.json
+/backend/SchoolSongManager.Api/data

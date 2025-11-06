@@ -1,0 +1,7 @@
+// Utilisation de la syntaxe moderne @use au lieu de @import
+@use 'variables' as *;
+@use 'layout';
+@use 'buttons';
+@use 'rhyme-cards';
+@use 'modal';
+@use 'forms';

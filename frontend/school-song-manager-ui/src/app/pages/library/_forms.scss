@@ -1,0 +1,41 @@
+@use 'variables' as *;
+
+form {
+  padding: $spacing-xl;
+}
+
+.form-group {
+  margin-bottom: $spacing-xl;
+  
+  label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    color: $text-secondary;
+    font-weight: bold;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid $border-input;
+    border-radius: $border-radius-sm;
+    font-size: 1rem;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+  
+  small {
+    display: block;
+    margin-top: $spacing-xs;
+    color: $muted-color;
+  }
+}

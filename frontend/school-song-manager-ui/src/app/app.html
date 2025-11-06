@@ -2,37 +2,17 @@
   <header>
     <h1>{{ title() }}</h1>
     <p>Nursery Rhyme Management System for Kindergarten Classes</p>
+    <div class="status-badge" [ngClass]="{'success': apiStatus().includes('✅'), 'error': apiStatus().includes('❌')}">
+      {{ apiStatus() }}
+    </div>
   </header>
 
+  <nav class="main-nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Accueil</a>
+    <a routerLink="/library" routerLinkActive="active">Bibliothèque de Comptines</a>
+  </nav>
+
   <main>
-    <div class="api-test-section">
-      <h2>API Connection Test</h2>
-      <div class="status-badge" [ngClass]="{'success': apiStatus().includes('✅'), 'error': apiStatus().includes('❌')}">
-        {{ apiStatus() }}
-      </div>
-      
-      @if (error()) {
-        <div class="error-message">
-          {{ error() }}
-          <button (click)="retryConnection()" class="retry-btn">Retry Connection</button>
-        </div>
-      }
-
-      @if (pingResponse()) {
-        <div class="response-section">
-          <h3>Ping Response:</h3>
-          <pre>{{ pingResponse() | json }}</pre>
-        </div>
-      }
-
-      @if (healthResponse()) {
-        <div class="response-section">
-          <h3>Health Check Response:</h3>
-          <pre>{{ healthResponse() | json }}</pre>
-        </div>
-      }
-    </div>
+    <router-outlet></router-outlet>
   </main>
-
-  <router-outlet></router-outlet>
 </div>

@@ -20,6 +20,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add repository
+builder.Services.AddSingleton<SchoolSongManager.Api.Services.INurseryRhymeRepository, SchoolSongManager.Api.Services.NurseryRhymeRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

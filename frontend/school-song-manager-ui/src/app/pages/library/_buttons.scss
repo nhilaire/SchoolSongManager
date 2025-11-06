@@ -1,0 +1,79 @@
+@use 'variables' as *;
+
+.add-btn {
+  background: $primary-color;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color $transition-default;
+  
+  &:hover {
+    background: $primary-hover;
+  }
+}
+
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  padding: $border-radius-md;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color $transition-default;
+}
+
+.edit-btn:hover {
+  background: $bg-hover-light;
+}
+
+.delete-btn:hover {
+  background: $bg-hover-danger;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: $text-light;
+  
+  &:hover {
+    color: $text-secondary;
+  }
+}
+
+.cancel-btn {
+  padding: $spacing-md $spacing-xl;
+  border: none;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-weight: bold;
+  background: $muted-color;
+  color: white;
+  
+  &:hover {
+    background: $muted-hover;
+  }
+}
+
+.save-btn {
+  padding: $spacing-md $spacing-xl;
+  border: none;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-weight: bold;
+  background: $success-color;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: $success-hover;
+  }
+  
+  &:disabled {
+    background: $muted-color;
+    cursor: not-allowed;
+  }
+}

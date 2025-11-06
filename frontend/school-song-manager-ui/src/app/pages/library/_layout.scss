@@ -1,0 +1,44 @@
+@use 'variables' as *;
+
+.library-container {
+  padding: $spacing-xl;
+}
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xxl;
+  
+  h2 {
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: $spacing-xxxl;
+  color: $text-light;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background: $bg-error;
+  color: #721c24;
+  padding: $spacing-lg;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-xl;
+  border: 1px solid $border-error;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px $spacing-xl;
+  color: $text-light;
+  
+  p {
+    font-size: 1.2rem;
+    margin-bottom: $spacing-xl;
+  }
+}
