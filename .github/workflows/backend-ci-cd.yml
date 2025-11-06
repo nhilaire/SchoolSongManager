@@ -7,6 +7,7 @@ on:
   pull_request:
     branches: [ main ]
     paths: [ 'backend/**' ]
+  workflow_dispatch:
 
 env:
   AZURE_WEBAPP_NAME: school-song-manager-api
