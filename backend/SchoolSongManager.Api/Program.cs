@@ -1,3 +1,5 @@
+using SchoolSongManager.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,7 +23,8 @@ builder.Services.AddCors(options =>
 });
 
 // Add repository
-builder.Services.AddSingleton<SchoolSongManager.Api.Services.INurseryRhymeRepository, SchoolSongManager.Api.Services.NurseryRhymeRepository>();
+builder.Services.AddSingleton<INurseryRhymeRepository, NurseryRhymeRepository>();
+builder.Services.AddSingleton<IThemeRepository, ThemeRepository>();
 
 var app = builder.Build();
 

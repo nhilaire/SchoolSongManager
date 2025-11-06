@@ -119,6 +119,7 @@ namespace SchoolSongManager.Api.Services
 
                 existingRhyme.Title = updatedRhyme.Title;
                 existingRhyme.Url = updatedRhyme.Url;
+                existingRhyme.ThemeIds = updatedRhyme.ThemeIds;
                 existingRhyme.UpdatedAt = DateTime.UtcNow;
 
                 // Conserver les fichiers existants si aucun nouveau fichier n'est fourni
@@ -213,11 +214,11 @@ namespace SchoolSongManager.Api.Services
             return fileName;
         }
 
-        public async Task<bool> DeleteAudioFileAsync(string fileName)
+        public Task<bool> DeleteAudioFileAsync(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             var filePath = Path.Combine(_audioPath, fileName);
@@ -227,22 +228,22 @@ namespace SchoolSongManager.Api.Services
                 try
                 {
                     File.Delete(filePath);
-                    return true;
+                    return Task.FromResult(true);
                 }
                 catch
                 {
-                    return false;
+                    return Task.FromResult(false);
                 }
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
-        public async Task<bool> DeleteImageFileAsync(string fileName)
+        public Task<bool> DeleteImageFileAsync(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             var filePath = Path.Combine(_imagePath, fileName);
@@ -252,15 +253,15 @@ namespace SchoolSongManager.Api.Services
                 try
                 {
                     File.Delete(filePath);
-                    return true;
+                    return Task.FromResult(true);
                 }
                 catch
                 {
-                    return false;
+                    return Task.FromResult(false);
                 }
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         public bool DeleteAudioFile(string fileName)

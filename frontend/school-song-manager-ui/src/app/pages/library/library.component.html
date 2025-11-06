@@ -24,6 +24,19 @@
         </div>
         
         <div class="rhyme-content">
+          @if (rhyme.themeIds && rhyme.themeIds.length > 0) {
+            <div class="themes-section">
+              @for (theme of getThemesForRhyme(rhyme.themeIds); track theme.id) {
+                <span 
+                  class="theme-chip" 
+                  [style.background-color]="theme.color"
+                >
+                  {{ theme.name }}
+                </span>
+              }
+            </div>
+          }
+          
           @if (rhyme.imageFileName) {
             <div class="image-section">
               <img [src]="getImageUrl(rhyme.imageFileName)" [alt]="rhyme.title" class="rhyme-image">
@@ -69,16 +82,18 @@
           <button class="close-btn" (click)="closeModal()">×</button>
         </div>
         
-        <form (ngSubmit)="saveRhyme()" #rhymeForm="ngForm">
+        <form [formGroup]="rhymeForm" (ngSubmit)="saveRhyme()">
           <div class="form-group">
             <label for="title">Titre *</label>
             <input 
               type="text" 
               id="title" 
-              name="title"
-              [(ngModel)]="formData.title" 
-              required 
+              formControlName="title"
+              class="form-control"
               placeholder="Titre de la comptine">
+            <div class="error-message" *ngIf="rhymeForm.get('title')?.invalid && rhymeForm.get('title')?.touched">
+              Le titre est requis (minimum 2 caractères)
+            </div>
           </div>
           
           <div class="form-group">
@@ -86,9 +101,14 @@
             <input 
               type="url" 
               id="url" 
-              name="url"
-              [(ngModel)]="formData.url"
+              formControlName="url"
+              class="form-control"
               placeholder="https://example.com/comptine">
+          </div>
+
+          <div class="form-group">
+            <label>Thèmes</label>
+            <app-theme-selector formControlName="themeIds"></app-theme-selector>
           </div>
           
           <div class="form-group">
@@ -97,6 +117,7 @@
               type="file" 
               id="imageFile" 
               accept="image/*"
+              class="form-control"
               (change)="onImageSelected($event)">
             @if (selectedImageFile()) {
               <small>Image sélectionnée: {{ selectedImageFile()?.name }}</small>
@@ -109,6 +130,7 @@
               type="file" 
               id="audioFile" 
               accept="audio/*"
+              class="form-control"
               (change)="onFileSelected($event)">
             @if (selectedFile()) {
               <small>Fichier sélectionné: {{ selectedFile()?.name }}</small>
@@ -117,7 +139,7 @@
           
           <div class="modal-actions">
             <button type="button" class="cancel-btn" (click)="closeModal()">Annuler</button>
-            <button type="submit" class="save-btn" [disabled]="!rhymeForm.valid || saving()">
+            <button type="submit" class="save-btn" [disabled]="rhymeForm.invalid || saving()">
               {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
             </button>
           </div>

@@ -1,0 +1,27 @@
+<div class="theme-selector">
+  <div class="theme-chips" *ngIf="availableThemes.length > 0">
+    <div 
+      class="theme-chip" 
+      *ngFor="let theme of availableThemes"
+      [class.selected]="isThemeSelected(theme.id)"
+      [style.background-color]="isThemeSelected(theme.id) ? theme.color : 'transparent'"
+      [style.border-color]="theme.color"
+      [style.color]="isThemeSelected(theme.id) ? 'white' : theme.color"
+      (click)="toggleTheme(theme.id)"
+    >
+      <span>{{ theme.name }}</span>
+      <i class="fas fa-check" *ngIf="isThemeSelected(theme.id)"></i>
+    </div>
+  </div>
+
+  <div class="no-themes" *ngIf="availableThemes.length === 0">
+    <p>Aucun thème disponible</p>
+    <a routerLink="/themes" class="create-theme-link">
+      <i class="fas fa-plus"></i> Créer des thèmes
+    </a>
+  </div>
+
+  <div class="selected-count" *ngIf="selectedThemeIds.length > 0">
+    {{ selectedThemeIds.length }} thème(s) sélectionné(s)
+  </div>
+</div>

@@ -60,7 +60,8 @@ namespace SchoolSongManager.Api.Controllers
                 var rhyme = new NurseryRhyme
                 {
                     Title = request.Title.Trim(),
-                    Url = request.Url?.Trim()
+                    Url = request.Url?.Trim(),
+                    ThemeIds = request.ThemeIds ?? new List<string>()
                 };
 
                 var createdRhyme = await _repository.CreateAsync(rhyme);
@@ -118,7 +119,8 @@ namespace SchoolSongManager.Api.Controllers
                 var updatedRhyme = new NurseryRhyme
                 {
                     Title = request.Title.Trim(),
-                    Url = request.Url?.Trim()
+                    Url = request.Url?.Trim(),
+                    ThemeIds = request.ThemeIds ?? new List<string>()
                 };
 
                 // Traiter le nouveau fichier audio s'il est fourni

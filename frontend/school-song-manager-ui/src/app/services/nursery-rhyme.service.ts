@@ -9,6 +9,7 @@ export interface NurseryRhyme {
   imageFileName?: string;
   url?: string;
   audioFileName?: string;
+  themeIds: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -16,11 +17,13 @@ export interface NurseryRhyme {
 export interface CreateNurseryRhymeRequest {
   title: string;
   url?: string;
+  themeIds: string[];
 }
 
 export interface UpdateNurseryRhymeRequest {
   title: string;
   url?: string;
+  themeIds: string[];
 }
 
 @Injectable({
@@ -49,6 +52,11 @@ export class NurseryRhymeService {
       formData.append('url', rhyme.url);
     }
     
+    // Ajouter les thèmes
+    rhyme.themeIds.forEach(themeId => {
+      formData.append('themeIds', themeId);
+    });
+    
     if (audioFile) {
       formData.append('audioFile', audioFile);
     }
@@ -67,6 +75,11 @@ export class NurseryRhymeService {
     if (rhyme.url) {
       formData.append('url', rhyme.url);
     }
+    
+    // Ajouter les thèmes
+    rhyme.themeIds.forEach(themeId => {
+      formData.append('themeIds', themeId);
+    });
     
     if (audioFile) {
       formData.append('audioFile', audioFile);

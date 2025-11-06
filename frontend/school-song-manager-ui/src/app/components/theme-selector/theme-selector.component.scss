@@ -1,0 +1,115 @@
+@use '../../../styles/variables' as vars;
+
+.theme-selector {
+  width: 100%;
+}
+
+.theme-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: vars.$spacing-sm;
+  margin-bottom: vars.$spacing-sm;
+}
+
+.theme-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: vars.$spacing-xs;
+  padding: vars.$spacing-xs vars.$spacing-md;
+  border: 2px solid;
+  border-radius: vars.$border-radius-lg;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  background: transparent;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.selected {
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+    .fas {
+      opacity: 1;
+    }
+  }
+
+  .fas {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 0.8rem;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.no-themes {
+  text-align: center;
+  padding: vars.$spacing-lg;
+  background: vars.$background-secondary;
+  border-radius: vars.$border-radius;
+  border: 1px dashed vars.$border-color;
+
+  p {
+    margin: 0 0 vars.$spacing-md 0;
+    color: vars.$text-light;
+  }
+
+  .create-theme-link {
+    display: inline-flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    color: vars.$primary-color;
+    text-decoration: none;
+    font-weight: 500;
+    padding: vars.$spacing-xs vars.$spacing-md;
+    border-radius: vars.$border-radius;
+    border: 1px solid vars.$primary-color;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: vars.$primary-color;
+      color: white;
+    }
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.selected-count {
+  font-size: 0.85rem;
+  color: vars.$text-light;
+  font-style: italic;
+  margin-top: vars.$spacing-xs;
+}
+
+// States
+.theme-chip {
+  &:disabled,
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .theme-chips {
+    gap: vars.$spacing-xs;
+  }
+
+  .theme-chip {
+    font-size: 0.8rem;
+    padding: vars.$spacing-xs vars.$spacing-sm;
+  }
+}

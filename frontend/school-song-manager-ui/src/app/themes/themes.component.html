@@ -1,0 +1,93 @@
+<div class="themes-container">
+  <div class="header">
+    <h1>Gestion des Thèmes</h1>
+    <button type="button" class="btn btn-primary" (click)="showCreateForm = true" [disabled]="showCreateForm">
+      <i class="fas fa-plus"></i> Nouveau Thème
+    </button>
+  </div>
+
+  <!-- Formulaire de création -->
+  <div class="form-section" *ngIf="showCreateForm">
+    <h2>{{ editingTheme ? 'Modifier le Thème' : 'Créer un Nouveau Thème' }}</h2>
+    <form [formGroup]="themeForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Nom du thème</label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name" 
+          class="form-control"
+          placeholder="Ex: Animaux, Saisons, Transport..."
+        >
+        <div class="error-message" *ngIf="themeForm.get('name')?.invalid && themeForm.get('name')?.touched">
+          Le nom du thème est requis
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="color">Couleur</label>
+        <div class="color-input-group">
+          <input 
+            type="color" 
+            id="color" 
+            formControlName="color" 
+            class="color-picker"
+          >
+          <input 
+            type="text" 
+            formControlName="color" 
+            class="form-control color-text"
+            placeholder="#FF5722"
+          >
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="themeForm.invalid">
+          {{ editingTheme ? 'Modifier' : 'Créer' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Liste des thèmes -->
+  <div class="themes-list">
+    <h2>Thèmes existants ({{ themes.length }})</h2>
+    
+    <div class="themes-grid" *ngIf="themes.length > 0">
+      <div class="theme-card" *ngFor="let theme of themes">
+        <div class="theme-preview">
+          <div class="theme-chip" [style.background-color]="theme.color">
+            {{ theme.name }}
+          </div>
+        </div>
+        
+        <div class="theme-info">
+          <h3>{{ theme.name }}</h3>
+          <span class="color-code">{{ theme.color }}</span>
+        </div>
+        
+        <div class="theme-actions">
+          <button type="button" class="btn btn-sm btn-outline" (click)="editTheme(theme)">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button type="button" class="btn btn-sm btn-danger" (click)="deleteTheme(theme.id)" 
+                  [disabled]="deleteInProgress === theme.id">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="themes.length === 0">
+      <i class="fas fa-tags"></i>
+      <p>Aucun thème créé pour le moment</p>
+      <button type="button" class="btn btn-primary" (click)="showCreateForm = true">
+        Créer le premier thème
+      </button>
+    </div>
+  </div>
+</div>

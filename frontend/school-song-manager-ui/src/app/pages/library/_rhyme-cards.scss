@@ -40,6 +40,24 @@
   margin-bottom: $spacing-lg;
 }
 
+.themes-section {
+  margin-bottom: $spacing-md;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  
+  .theme-chip {
+    display: inline-block;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-lg;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+  }
+}
+
 .image-section {
   margin-bottom: $spacing-lg;
   

@@ -1,0 +1,161 @@
+@use 'variables' as vars;
+@use 'sass:color';
+
+// Mixins pour les boutons
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border: 1px solid transparent;
+  border-radius: vars.$border-radius;
+  font-size: vars.$font-size-base;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(vars.$primary-color, 0.25);
+  }
+}
+
+@mixin button-variant($bg-color, $text-color: white, $border-color: $bg-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border-color: $border-color;
+
+  &:hover:not(:disabled) {
+    background-color: color.adjust($bg-color, $lightness: -10%);
+    border-color: color.adjust($border-color, $lightness: -10%);
+  }
+
+  &:active {
+    background-color: color.adjust($bg-color, $lightness: -15%);
+    border-color: color.adjust($border-color, $lightness: -15%);
+  }
+}
+
+// Mixins pour les cartes
+@mixin card {
+  background: vars.$background-color;
+  border: 1px solid vars.$border-color;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow;
+  overflow: hidden;
+}
+
+@mixin card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: vars.$shadow-lg;
+  }
+}
+
+// Mixins pour les formulaires
+@mixin form-control {
+  width: 100%;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border: 1px solid vars.$border-color;
+  border-radius: vars.$border-radius;
+  font-size: vars.$font-size-base;
+  line-height: vars.$line-height-base;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: vars.$primary-color;
+    box-shadow: 0 0 0 3px rgba(vars.$primary-color, 0.25);
+  }
+
+  &:invalid {
+    border-color: vars.$danger-color;
+  }
+
+  &:disabled {
+    background-color: vars.$background-secondary;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Mixins pour la grille
+@mixin grid($columns: 1, $gap: vars.$spacing-md) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+@mixin grid-responsive($mobile: 1, $tablet: 2, $desktop: 3, $gap: vars.$spacing-md) {
+  display: grid;
+  grid-template-columns: repeat($mobile, 1fr);
+  gap: $gap;
+
+  @media (min-width: vars.$breakpoint-md) {
+    grid-template-columns: repeat($tablet, 1fr);
+  }
+
+  @media (min-width: vars.$breakpoint-lg) {
+    grid-template-columns: repeat($desktop, 1fr);
+  }
+}
+
+// Mixins pour les animations
+@mixin fade-in($duration: 0.3s) {
+  animation: fadeIn $duration ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Mixins pour les utilitaires
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@mixin clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}

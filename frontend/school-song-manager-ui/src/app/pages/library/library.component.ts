@@ -1,17 +1,21 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NurseryRhymeService, NurseryRhyme } from '../../services/nursery-rhyme.service';
+import { ThemeService } from '../../services/theme.service';
+import { Theme } from '../../models/theme.model';
+import { ThemeSelectorComponent } from '../../components/theme-selector/theme-selector.component';
 
 @Component({
   selector: 'app-library',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ThemeSelectorComponent],
   templateUrl: './library.component.html',
   styleUrl: './library.component.scss'
 })
 export class LibraryComponent implements OnInit {
   protected readonly nurseryRhymes = signal<NurseryRhyme[]>([]);
+  protected readonly themes = signal<Theme[]>([]);
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly showModal = signal(false);
@@ -20,15 +24,19 @@ export class LibraryComponent implements OnInit {
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly selectedImageFile = signal<File | null>(null);
   
-  protected formData = {
-    title: '',
-    url: ''
-  };
-
-  constructor(private nurseryRhymeService: NurseryRhymeService) {}
+  private nurseryRhymeService = inject(NurseryRhymeService) as NurseryRhymeService;
+  private themeService = inject(ThemeService) as ThemeService;
+  private formBuilder = inject(FormBuilder) as FormBuilder;
+  
+  protected rhymeForm: FormGroup = this.formBuilder.group({
+    title: ['', [Validators.required, Validators.minLength(2)]],
+    url: [''],
+    themeIds: [[]]
+  });
 
   ngOnInit() {
     this.loadRhymes();
+    this.loadThemes();
   }
 
   private loadRhymes() {
@@ -47,9 +55,24 @@ export class LibraryComponent implements OnInit {
     });
   }
 
+  private loadThemes() {
+    this.themeService.getThemes().subscribe({
+      next: (themes: Theme[]) => {
+        this.themes.set(themes);
+      },
+      error: (err: any) => {
+        console.error('Erreur lors du chargement des thèmes:', err);
+      }
+    });
+  }
+
   openAddModal() {
     this.editingRhyme.set(null);
-    this.formData = { title: '', url: '' };
+    this.rhymeForm.reset({
+      title: '',
+      url: '',
+      themeIds: []
+    });
     this.selectedFile.set(null);
     this.selectedImageFile.set(null);
     this.showModal.set(true);
@@ -57,7 +80,11 @@ export class LibraryComponent implements OnInit {
 
   editRhyme(rhyme: NurseryRhyme) {
     this.editingRhyme.set(rhyme);
-    this.formData = { title: rhyme.title, url: rhyme.url || '' };
+    this.rhymeForm.patchValue({
+      title: rhyme.title,
+      url: rhyme.url || '',
+      themeIds: rhyme.themeIds || []
+    });
     this.selectedFile.set(null);
     this.selectedImageFile.set(null);
     this.showModal.set(true);
@@ -85,15 +112,16 @@ export class LibraryComponent implements OnInit {
   }
 
   saveRhyme() {
-    if (!this.formData.title) {
+    if (this.rhymeForm.invalid) {
       return;
     }
 
     this.saving.set(true);
     
     const rhymeData = {
-      title: this.formData.title,
-      url: this.formData.url
+      title: this.rhymeForm.value.title,
+      url: this.rhymeForm.value.url || '',
+      themeIds: this.rhymeForm.value.themeIds || []
     };
 
     const operation = this.editingRhyme() 
@@ -136,5 +164,9 @@ export class LibraryComponent implements OnInit {
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('fr-FR');
+  }
+
+  getThemesForRhyme(themeIds: string[]): Theme[] {
+    return this.themes().filter(theme => themeIds.includes(theme.id));
   }
 }

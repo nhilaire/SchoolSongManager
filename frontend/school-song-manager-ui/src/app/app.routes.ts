@@ -10,6 +10,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/library/library.component').then(m => m.LibraryComponent)
   },
   {
+    path: 'themes',
+    loadComponent: () => import('./themes/themes.component').then(m => m.ThemesComponent)
+  },
+  {
     path: '**',
     redirectTo: ''
   }
