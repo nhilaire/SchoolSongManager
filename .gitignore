@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/backend/CORS-CONFIGURATION.md
+/frontend/school-song-manager-ui/.vscode
+/frontend/school-song-manager-ui/package-lock.json

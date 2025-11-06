@@ -1,0 +1,38 @@
+<div class="container">
+  <header>
+    <h1>{{ title() }}</h1>
+    <p>Nursery Rhyme Management System for Kindergarten Classes</p>
+  </header>
+
+  <main>
+    <div class="api-test-section">
+      <h2>API Connection Test</h2>
+      <div class="status-badge" [ngClass]="{'success': apiStatus().includes('✅'), 'error': apiStatus().includes('❌')}">
+        {{ apiStatus() }}
+      </div>
+      
+      @if (error()) {
+        <div class="error-message">
+          {{ error() }}
+          <button (click)="retryConnection()" class="retry-btn">Retry Connection</button>
+        </div>
+      }
+
+      @if (pingResponse()) {
+        <div class="response-section">
+          <h3>Ping Response:</h3>
+          <pre>{{ pingResponse() | json }}</pre>
+        </div>
+      }
+
+      @if (healthResponse()) {
+        <div class="response-section">
+          <h3>Health Check Response:</h3>
+          <pre>{{ healthResponse() | json }}</pre>
+        </div>
+      }
+    </div>
+  </main>
+
+  <router-outlet></router-outlet>
+</div>

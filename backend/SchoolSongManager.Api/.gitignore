@@ -1,0 +1,52 @@
+# Logs and temporary files
+*.log
+logs/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio files
+.vs/
+*.user
+*.rsuser
+*.suo
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Build Tools
+.vscode/
+.idea/
+
+# NuGet Packages
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# Coverage results
+*.coverage
+*.coveragexml
+
+# Data directory should be preserved but not uploaded to source control initially
+# Remove this line if you want to commit initial data
+data/songs/*
+data/themes/*
+data/history/*
+data/uploads/*
+!data/*.md
