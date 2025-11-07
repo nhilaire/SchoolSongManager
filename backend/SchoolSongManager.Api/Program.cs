@@ -22,9 +22,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add repository
+// Add repositories
 builder.Services.AddSingleton<INurseryRhymeRepository, NurseryRhymeRepository>();
 builder.Services.AddSingleton<IThemeRepository, ThemeRepository>();
+builder.Services.AddSingleton<NurseryRhymeAssignmentRepository>();
+
+// Add PDF generator service
+builder.Services.AddSingleton<IPdfGeneratorService, PdfGeneratorService>();
 
 var app = builder.Build();
 

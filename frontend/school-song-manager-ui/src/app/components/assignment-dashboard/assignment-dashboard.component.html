@@ -1,0 +1,240 @@
+<div class="assignment-dashboard">
+  <div class="dashboard-header">
+    <h2>Tableau de Bord des Assignations</h2>
+    <p>Gérez les comptines assignées par année scolaire et période</p>
+  </div>
+
+  <div class="dashboard-filters" *ngIf="!loading()">
+    <div class="filter-group">
+      <label for="school-year-filter">Année scolaire :</label>
+      <select 
+        id="school-year-filter"
+        [value]="selectedSchoolYear()"
+        (change)="onSchoolYearChange($any($event.target).value)"
+        class="filter-select">
+        <option value="">Toutes les années</option>
+        <option *ngFor="let year of schoolYears()" [value]="year">
+          {{ year }}
+          <span *ngIf="year === currentSchoolYear()" class="current-year">(actuelle)</span>
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="period-filter">Période :</label>
+      <select 
+        id="period-filter"
+        [value]="selectedPeriod()"
+        (change)="onPeriodChange($any($event.target).value)"
+        class="filter-select">
+        <option value="">Toutes les périodes</option>
+        <option *ngFor="let period of schoolPeriods" [value]="period">
+          {{ period }} - {{ getPeriodLabel(period) }}
+        </option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn-secondary" (click)="clearFilters()">
+      <i class="fas fa-times"></i>
+      Effacer les filtres
+    </button>
+  </div>
+
+  <div class="loading-indicator" *ngIf="loading()">
+    <i class="fas fa-spinner fa-spin"></i>
+    Chargement des données...
+  </div>
+
+  <div class="error-message" *ngIf="error()">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error() }}
+    <button type="button" class="btn btn-sm btn-secondary" (click)="loadData()">
+      Réessayer
+    </button>
+  </div>
+
+  <div class="assignments-summary" *ngIf="!loading() && !error()">
+    <div class="summary-stats">
+      <div class="stat-card">
+        <span class="stat-number">{{ filteredAssignments().length }}</span>
+        <span class="stat-label">Assignations</span>
+      </div>
+      <div class="stat-card" *ngIf="selectedSchoolYear()">
+        <span class="stat-number">{{ selectedSchoolYear() }}</span>
+        <span class="stat-label">Année sélectionnée</span>
+      </div>
+      <div class="stat-card" *ngIf="selectedPeriod()">
+        <span class="stat-number">{{ selectedPeriod() }}</span>
+        <span class="stat-label">Période sélectionnée</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Système d'accordéon -->
+  <div class="accordion-container" *ngIf="!loading() && !error()">
+    
+    <!-- Section 1: Visualisation des assignations existantes -->
+    <div class="accordion-section">
+      <button 
+        type="button" 
+        class="accordion-header"
+        (click)="toggleSection('assignments')"
+        [class.collapsed]="!isExpanded('assignments')">
+        <i class="fas" [class.fa-chevron-up]="isExpanded('assignments')" [class.fa-chevron-down]="!isExpanded('assignments')"></i>
+        <span>Assignations existantes ({{ filteredAssignments().length }})</span>
+      </button>
+      
+      <div class="accordion-content" [class.collapsed]="!isExpanded('assignments')">
+        <!-- Vue tableau existante -->
+        <div class="assignments-table-view" *ngIf="filteredAssignments().length > 0">
+          <div class="table-container">
+            <table class="assignments-table">
+              <thead>
+                <tr>
+                  <th>Année scolaire</th>
+                  <th>Titre de la comptine</th>
+                  <th>Période</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let assignment of filteredAssignments(); let i = index" 
+                    class="assignment-row"
+                    [ngClass]="getYearRowClass(assignment.schoolYear)">
+                  <td class="school-year-cell">
+                    <span class="school-year">{{ assignment.schoolYear }}</span>
+                    <span *ngIf="assignment.schoolYear === currentSchoolYear()" class="current-badge">actuelle</span>
+                  </td>
+                  <td class="rhyme-title-cell">
+                    <div class="rhyme-info">
+                      <img 
+                        *ngIf="assignment.nurseryRhyme?.imageUrl" 
+                        [src]="assignment.nurseryRhyme!.imageUrl" 
+                        [alt]="assignment.nurseryRhyme!.title"
+                        class="rhyme-thumbnail" />
+                      <span class="rhyme-title">{{ assignment.nurseryRhyme?.title || 'Comptine inconnue' }}</span>
+                    </div>
+                  </td>
+                  <td class="period-cell">
+                    <span class="period-badge">{{ assignment.period }}</span>
+                    <span class="period-label">{{ getPeriodLabel(assignment.period) }}</span>
+                  </td>
+                  <td class="actions-cell">
+                    <button 
+                      type="button" 
+                      class="btn btn-danger btn-sm"
+                      (click)="deleteAssignment(assignment.id)"
+                      [disabled]="deletionLoading()"
+                      title="Supprimer cette assignation">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Message si aucune assignation -->
+        <div class="empty-state" *ngIf="filteredAssignments().length === 0">
+          <i class="fas fa-book-open"></i>
+          <h3>Aucune assignation trouvée</h3>
+          <p>Les assignations créées apparaîtront ici selon les filtres appliqués.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Création de nouvelles assignations -->
+    <div class="accordion-section">
+      <button 
+        type="button" 
+        class="accordion-header"
+        (click)="toggleSection('generator')"
+        [class.collapsed]="!isExpanded('generator')">
+        <i class="fas" [class.fa-chevron-up]="isExpanded('generator')" [class.fa-chevron-down]="!isExpanded('generator')"></i>
+        <span>Créer de nouvelles assignations</span>
+      </button>
+      
+      <div class="accordion-content" [class.collapsed]="!isExpanded('generator')">
+        <!-- Formulaire de génération -->
+        <div class="generator-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="target-year">Année scolaire :</label>
+              <select 
+                id="target-year"
+                [(ngModel)]="targetSchoolYear"
+                class="form-select">
+                <option value="">Sélectionnez une année</option>
+                <option *ngFor="let year of schoolYears()" [value]="year">{{ year }}</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Période :</label>
+              <div class="radio-group">
+                <div *ngFor="let period of schoolPeriods" class="radio-item">
+                  <input 
+                    type="radio" 
+                    [id]="'period-' + period"
+                    name="targetPeriod" 
+                    [value]="period"
+                    [(ngModel)]="targetPeriod">
+                  <label [for]="'period-' + period">{{ period }} - {{ getPeriodLabel(period) }}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des comptines avec cases à cocher -->
+        <div class="nursery-rhymes-selection" *ngIf="allNurseryRhymes().length > 0">
+          <h4>Sélectionnez les comptines :</h4>
+          <div class="rhymes-grid">
+            <div *ngFor="let rhyme of allNurseryRhymes(); let i = index" class="rhyme-item">
+              <label class="rhyme-checkbox">
+                <input 
+                  type="checkbox" 
+                  [checked]="isRhymeSelected(rhyme.id)"
+                  (change)="toggleRhymeSelection(rhyme.id, $event)">
+                <div class="rhyme-card">
+                  <img 
+                    *ngIf="rhyme.imageFileName" 
+                    [src]="getImageUrl(rhyme.imageFileName)" 
+                    [alt]="rhyme.title"
+                    class="rhyme-image" />
+                  <span class="rhyme-title">{{ rhyme.title }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions de génération -->
+        <div class="generator-actions" *ngIf="selectedRhymeIds().length > 0 && targetSchoolYear && targetPeriod">
+          <div class="selection-summary">
+            <span>{{ selectedRhymeIds().length }} comptine(s) sélectionnée(s) pour {{ targetSchoolYear }} - {{ getPeriodLabel(targetPeriod) }}</span>
+          </div>
+          <div class="action-buttons">
+            <button 
+              type="button" 
+              class="btn btn-primary btn-combined"
+              (click)="saveAndGeneratePdf()"
+              [disabled]="generationLoading()">
+              <i class="fas fa-file-pdf"></i>
+              Enregistrer et générer le PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Message de chargement pour la génération -->
+        <div class="generation-loading" *ngIf="generationLoading()">
+          <i class="fas fa-spinner fa-spin"></i>
+          {{ generationMessage() }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section supprimée: ancien affichage sans accordéon -->
+</div>
