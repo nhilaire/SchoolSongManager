@@ -24,7 +24,7 @@ export class AppConfig {
     
     // Priorité 2: Développement local
     if (window.location.hostname === 'localhost') {
-      return 'https://localhost:7159';
+      return 'http://localhost:5168';
     }
     
     // Priorité 3: Erreur - aucune configuration trouvée

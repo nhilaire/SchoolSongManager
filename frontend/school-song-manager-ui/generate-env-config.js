@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Get environment variables
-const apiUrl = process.env.API_URL || 'https://localhost:7159';
+const apiUrl = process.env.API_URL || 'http://localhost:5168';
 const nodeEnv = process.env.NODE_ENV || 'development';
 
 // Create the environment configuration

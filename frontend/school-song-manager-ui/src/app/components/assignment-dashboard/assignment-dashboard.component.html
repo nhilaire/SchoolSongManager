@@ -1,8 +1,4 @@
 <div class="assignment-dashboard">
-  <div class="dashboard-header">
-    <h3>Paramètres de l'assignation</h3>
-    <p>Sélectionnez une année scolaire, une période et les comptines à assigner</p>
-  </div>
 
   <div class="loading-indicator" *ngIf="loading()">
     <i class="fas fa-spinner fa-spin"></i>
@@ -180,8 +176,6 @@
           </label>
         </div>
       </div>
-    </div>
-
     <!-- Actions de génération -->
     <div class="generator-actions" *ngIf="selectedRhymeIds().length > 0 && targetSchoolYear && targetPeriod">
       <div class="selection-summary">
