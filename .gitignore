@@ -420,3 +420,7 @@ FodyWeavers.xsd
 /frontend/school-song-manager-ui/.vscode
 /frontend/school-song-manager-ui/package-lock.json
 /backend/SchoolSongManager.Api/data
+
+# Exclude all markdown files except main README.md
+*.md
+!README.md
