@@ -2,7 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ThemeService } from '../services/theme.service';
+import { NurseryRhymeService, NurseryRhyme } from '../services/nursery-rhyme.service';
 import { Theme } from '../models/theme.model';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-themes',
@@ -13,9 +15,12 @@ import { Theme } from '../models/theme.model';
 })
 export class ThemesComponent implements OnInit {
   private themeService = inject(ThemeService);
+  private nurseryRhymeService = inject(NurseryRhymeService);
   private formBuilder = inject(FormBuilder);
 
   themes: Theme[] = [];
+  nurseryRhymes: NurseryRhyme[] = [];
+  themeCounts: { [themeId: string]: number } = {};
   showCreateForm = false;
   editingTheme: Theme | null = null;
   deleteInProgress: string | null = null;
@@ -30,14 +35,44 @@ export class ThemesComponent implements OnInit {
   }
 
   loadThemes(): void {
-    this.themeService.getThemes().subscribe({
-      next: (themes: Theme[]) => {
+    // Charger les thèmes et les comptines en parallèle
+    forkJoin({
+      themes: this.themeService.getThemes(),
+      nurseryRhymes: this.nurseryRhymeService.getAllRhymes()
+    }).subscribe({
+      next: ({ themes, nurseryRhymes }) => {
         this.themes = themes;
+        this.nurseryRhymes = nurseryRhymes;
+        this.calculateThemeCounts();
       },
       error: (error: any) => {
-        console.error('Erreur lors du chargement des thèmes:', error);
+        console.error('Erreur lors du chargement des données:', error);
       }
     });
+  }
+
+  private calculateThemeCounts(): void {
+    this.themeCounts = {};
+    
+    // Initialiser tous les thèmes à 0
+    this.themes.forEach(theme => {
+      this.themeCounts[theme.id] = 0;
+    });
+    
+    // Compter les comptines pour chaque thème
+    this.nurseryRhymes.forEach(rhyme => {
+      if (rhyme.themeIds && rhyme.themeIds.length > 0) {
+        rhyme.themeIds.forEach(themeId => {
+          if (this.themeCounts.hasOwnProperty(themeId)) {
+            this.themeCounts[themeId]++;
+          }
+        });
+      }
+    });
+  }
+
+  getThemeCount(themeId: string): number {
+    return this.themeCounts[themeId] || 0;
   }
 
   onSubmit(): void {

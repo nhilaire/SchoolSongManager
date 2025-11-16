@@ -10,7 +10,6 @@ import { Api, PingResponse } from './services/api';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
-  protected readonly title = signal('School Song Manager');
   protected readonly apiStatus = signal<string>('Checking...');
 
   constructor(private api: Api) {}

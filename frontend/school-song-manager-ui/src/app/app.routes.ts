@@ -14,6 +14,20 @@ export const routes: Routes = [
     loadComponent: () => import('./themes/themes.component').then(m => m.ThemesComponent)
   },
   {
+    path: 'assignments',
+    children: [
+      {
+        path: '',
+        redirectTo: 'list',
+        pathMatch: 'full'
+      },
+      {
+        path: 'list',
+        loadComponent: () => import('./components/assignment-list/assignment-list.component').then(m => m.AssignmentListComponent)
+      }
+    ]
+  },
+  {
     path: '**',
     redirectTo: ''
   }

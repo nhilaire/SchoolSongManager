@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { AssignmentDashboardComponent } from '../../components/assignment-dashboard/assignment-dashboard.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, AssignmentDashboardComponent],
+  imports: [CommonModule, RouterModule, AssignmentDashboardComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

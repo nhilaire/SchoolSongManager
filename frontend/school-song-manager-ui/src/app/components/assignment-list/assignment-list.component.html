@@ -1,0 +1,141 @@
+<div class="assignment-list">
+  <div class="page-header">
+    <h2>Liste des Assignations</h2>
+    <p>Consultez et gérez toutes les assignations de comptines</p>
+  </div>
+
+  <div class="list-filters" *ngIf="!loading()">
+    <div class="filter-group">
+      <label for="school-year-filter">Année scolaire :</label>
+      <select 
+        id="school-year-filter"
+        [value]="selectedSchoolYear()"
+        (change)="onSchoolYearChange($any($event.target).value)"
+        class="filter-select">
+        <option value="">Toutes les années</option>
+        <option *ngFor="let year of schoolYears()" [value]="year">
+          {{ year }}
+          <span *ngIf="year === currentSchoolYear()" class="current-year">(actuelle)</span>
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="period-filter">Période :</label>
+      <select 
+        id="period-filter"
+        [value]="selectedPeriod()"
+        (change)="onPeriodChange($any($event.target).value)"
+        class="filter-select">
+        <option value="">Toutes les périodes</option>
+        <option *ngFor="let period of schoolPeriods" [value]="period">
+          {{ period }} - {{ getPeriodLabel(period) }}
+        </option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn-secondary" (click)="clearFilters()">
+      <i class="fas fa-times"></i>
+      Effacer les filtres
+    </button>
+  </div>
+
+  <div class="loading-indicator" *ngIf="loading()">
+    <i class="fas fa-spinner fa-spin"></i>
+    Chargement des données...
+  </div>
+
+  <div class="error-message" *ngIf="error()">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error() }}
+    <button type="button" class="btn btn-sm btn-secondary" (click)="loadData()">
+      Réessayer
+    </button>
+  </div>
+
+  <div class="assignments-summary" *ngIf="!loading() && !error()">
+    <div class="summary-stats">
+      <div class="stat-card">
+        <span class="stat-number">{{ filteredAssignments().length }}</span>
+        <span class="stat-label">Assignations trouvées</span>
+      </div>
+      <div class="stat-card" *ngIf="selectedSchoolYear()">
+        <span class="stat-number">{{ selectedSchoolYear() }}</span>
+        <span class="stat-label">Année sélectionnée</span>
+      </div>
+      <div class="stat-card" *ngIf="selectedPeriod()">
+        <span class="stat-number">{{ selectedPeriod() }}</span>
+        <span class="stat-label">Période sélectionnée</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message de chargement pour la suppression -->
+  <div class="deletion-loading" *ngIf="deletionLoading()">
+    <i class="fas fa-spinner fa-spin"></i>
+    Suppression en cours...
+  </div>
+
+  <!-- Tableau des assignations -->
+  <div class="assignments-table-view" *ngIf="!loading() && !error() && filteredAssignments().length > 0">
+    <div class="table-container">
+      <table class="assignments-table">
+        <thead>
+          <tr>
+            <th>Année scolaire</th>
+            <th>Titre de la comptine</th>
+            <th>Période</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let assignment of filteredAssignments(); let i = index" 
+              class="assignment-row"
+              [ngClass]="getYearRowClass(assignment.schoolYear)">
+            <td class="school-year-cell">
+              <span class="school-year">{{ assignment.schoolYear }}</span>
+              <span *ngIf="assignment.schoolYear === currentSchoolYear()" class="current-badge">actuelle</span>
+            </td>
+            <td class="rhyme-title-cell">
+              <div class="rhyme-info">
+                <img 
+                  *ngIf="assignment.nurseryRhyme?.imageUrl" 
+                  [src]="assignment.nurseryRhyme!.imageUrl" 
+                  [alt]="assignment.nurseryRhyme!.title"
+                  class="rhyme-thumbnail" />
+                <span class="rhyme-title">{{ assignment.nurseryRhyme?.title || 'Comptine inconnue' }}</span>
+              </div>
+            </td>
+            <td class="period-cell">
+              <span class="period-badge">{{ assignment.period }}</span>
+              <span class="period-label">{{ getPeriodLabel(assignment.period) }}</span>
+            </td>
+            <td class="actions-cell">
+              <button 
+                type="button" 
+                class="btn btn-danger btn-sm"
+                (click)="deleteAssignment(assignment.id)"
+                [disabled]="deletionLoading()"
+                title="Supprimer cette assignation">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Message si aucune assignation -->
+  <div class="empty-state" *ngIf="!loading() && !error() && filteredAssignments().length === 0">
+    <i class="fas fa-book-open"></i>
+    <h3>Aucune assignation trouvée</h3>
+    <p>Aucune assignation ne correspond aux critères sélectionnés.</p>
+    <div class="empty-actions">
+      <button type="button" class="btn btn-primary" routerLink="/assignments/create">
+        <i class="fas fa-plus"></i>
+        Créer une assignation
+      </button>
+    </div>
+  </div>
+</div>
