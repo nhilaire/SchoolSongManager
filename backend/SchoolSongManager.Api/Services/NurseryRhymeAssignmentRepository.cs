@@ -276,6 +276,35 @@ public class NurseryRhymeAssignmentRepository
     public async Task<List<string>> GetAvailableSchoolYearsAsync()
     {
         var assignments = await GetAllAssignmentsAsync();
-        return assignments.Select(a => a.SchoolYear).Distinct().OrderBy(y => y).ToList();
+        var assignedYears = assignments.Select(a => a.SchoolYear).Distinct().ToHashSet();
+
+        // Generate default school years from 2020 to current year + 1
+        var defaultYears = GenerateDefaultSchoolYears();
+
+        // Merge assigned years with default years
+        foreach (var year in assignedYears)
+        {
+            defaultYears.Add(year);
+        }
+
+        return defaultYears.OrderBy(y => y).ToList();
+    }
+
+    private HashSet<string> GenerateDefaultSchoolYears()
+    {
+        var years = new HashSet<string>();
+        var currentYear = DateTime.Now.Year;
+        var currentMonth = DateTime.Now.Month;
+
+        // If we're in September or later, include next year
+        var endYear = currentMonth >= 9 ? currentYear + 1 : currentYear;
+
+        // Generate years from 2020 to current/next year
+        for (int startYear = 2020; startYear <= endYear; startYear++)
+        {
+            years.Add($"{startYear}/{startYear + 1}");
+        }
+
+        return years;
     }
 }
