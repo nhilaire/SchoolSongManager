@@ -41,3 +41,63 @@
   padding-top: $spacing-xl;
   border-top: 1px solid $border-light;
 }
+
+// Lightbox pour affichage image plein écran
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  cursor: pointer;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: $spacing-xl;
+  right: $spacing-xl;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2.5rem;
+  cursor: pointer;
+  z-index: 2001;
+  line-height: 1;
+  padding: $spacing-sm;
+  transition: transform $transition-default, opacity $transition-default;
+
+  &:hover {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+.lightbox-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 90vw;
+  max-height: 90vh;
+  cursor: default;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: $border-radius-md;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-title {
+  color: white;
+  font-size: 1.2rem;
+  margin-top: $spacing-lg;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}

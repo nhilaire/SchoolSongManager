@@ -60,13 +60,23 @@
 
 .image-section {
   margin-bottom: $spacing-lg;
-  
+
   .rhyme-image {
     width: 100%;
     height: 200px;
     object-fit: cover;
     border-radius: $border-radius-md;
     border: 1px solid $border-light;
+
+    &.clickable {
+      cursor: pointer;
+      transition: transform $transition-default, box-shadow $transition-default;
+
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: $shadow-hover;
+      }
+    }
   }
 }
 

@@ -23,6 +23,7 @@ export class LibraryComponent implements OnInit {
   protected readonly saving = signal(false);
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly selectedImageFile = signal<File | null>(null);
+  protected readonly lightboxImage = signal<{ url: string; title: string } | null>(null);
   
   private nurseryRhymeService = inject(NurseryRhymeService) as NurseryRhymeService;
   private themeService = inject(ThemeService) as ThemeService;
@@ -168,5 +169,16 @@ export class LibraryComponent implements OnInit {
 
   getThemesForRhyme(themeIds: string[]): Theme[] {
     return this.themes().filter(theme => themeIds.includes(theme.id));
+  }
+
+  openLightbox(imageFileName: string, title: string) {
+    this.lightboxImage.set({
+      url: this.getImageUrl(imageFileName),
+      title: title
+    });
+  }
+
+  closeLightbox() {
+    this.lightboxImage.set(null);
   }
 }

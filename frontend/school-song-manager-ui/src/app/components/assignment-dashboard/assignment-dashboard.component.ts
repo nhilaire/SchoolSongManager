@@ -299,41 +299,46 @@ export class AssignmentDashboardComponent implements OnInit {
     const selectedPeriods = this.selectedPeriods();
     const selectedThemes = this.selectedThemes();
 
+    let result: NurseryRhyme[];
+
     // Si aucun filtre n'est actif, afficher toutes les comptines
     if (filters.length === 0 && selectedYears.length === 0 && selectedPeriods.length === 0 && selectedThemes.length === 0) {
-      return allRhymes;
+      result = [...allRhymes];
+    } else {
+      result = allRhymes.filter(rhyme => {
+        const history = this.getAssignmentHistory(rhyme.id);
+
+        // Si le filtre "jamais utilisées" est sélectionné et que la comptine n'a pas d'historique
+        if (filters.includes('never-used') && history.length === 0) {
+          // Vérifier aussi les filtres de thèmes même pour les comptines jamais utilisées
+          if (selectedThemes.length > 0) {
+            return rhyme.themeIds.some(themeId => selectedThemes.includes(themeId));
+          }
+          return true;
+        }
+
+        // Si la comptine n'a pas d'historique et que d'autres filtres sont actifs (hors thèmes)
+        if (history.length === 0 && (selectedYears.length > 0 || selectedPeriods.length > 0)) {
+          return false;
+        }
+
+        // Vérifier les filtres d'années
+        const yearMatch = selectedYears.length === 0 || history.some(h => selectedYears.includes(h.year));
+
+        // Vérifier les filtres de périodes
+        const periodMatch = selectedPeriods.length === 0 || history.some(h =>
+          h.periods.some(period => selectedPeriods.includes(period))
+        );
+
+        // Vérifier les filtres de thèmes
+        const themeMatch = selectedThemes.length === 0 || rhyme.themeIds.some(themeId => selectedThemes.includes(themeId));
+
+        return yearMatch && periodMatch && themeMatch;
+      });
     }
 
-    return allRhymes.filter(rhyme => {
-      const history = this.getAssignmentHistory(rhyme.id);
-      
-      // Si le filtre "jamais utilisées" est sélectionné et que la comptine n'a pas d'historique
-      if (filters.includes('never-used') && history.length === 0) {
-        // Vérifier aussi les filtres de thèmes même pour les comptines jamais utilisées
-        if (selectedThemes.length > 0) {
-          return rhyme.themeIds.some(themeId => selectedThemes.includes(themeId));
-        }
-        return true;
-      }
-
-      // Si la comptine n'a pas d'historique et que d'autres filtres sont actifs (hors thèmes)
-      if (history.length === 0 && (selectedYears.length > 0 || selectedPeriods.length > 0)) {
-        return false;
-      }
-
-      // Vérifier les filtres d'années
-      const yearMatch = selectedYears.length === 0 || history.some(h => selectedYears.includes(h.year));
-      
-      // Vérifier les filtres de périodes
-      const periodMatch = selectedPeriods.length === 0 || history.some(h => 
-        h.periods.some(period => selectedPeriods.includes(period))
-      );
-
-      // Vérifier les filtres de thèmes
-      const themeMatch = selectedThemes.length === 0 || rhyme.themeIds.some(themeId => selectedThemes.includes(themeId));
-
-      return yearMatch && periodMatch && themeMatch;
-    });
+    // Trier par ordre alphabétique (insensible à la casse)
+    return result.sort((a, b) => a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' }));
   }
 
   getThemeById(themeId: string): Theme | undefined {

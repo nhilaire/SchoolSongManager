@@ -8,8 +8,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add CORS with configurable origins
-var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>() 
-    ?? new[] { "http://localhost:4200", "https://localhost:4200" };
+var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:4200", "https://localhost:4200", "http://localhost:5168", "https://localhost:7159" };
 
 builder.Services.AddCors(options =>
 {
@@ -39,10 +39,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-// Use CORS
+// Use CORS - MUST be before UseHttpsRedirection to handle preflight requests
 app.UseCors("AllowAngularApp");
+
+// Only redirect to HTTPS in production to avoid CORS issues with HTTP in development
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 

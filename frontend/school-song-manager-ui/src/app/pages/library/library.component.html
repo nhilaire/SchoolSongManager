@@ -39,7 +39,11 @@
           
           @if (rhyme.imageFileName) {
             <div class="image-section">
-              <img [src]="getImageUrl(rhyme.imageFileName)" [alt]="rhyme.title" class="rhyme-image">
+              <img
+                [src]="getImageUrl(rhyme.imageFileName)"
+                [alt]="rhyme.title"
+                class="rhyme-image clickable"
+                (click)="openLightbox(rhyme.imageFileName, rhyme.title)">
             </div>
           }
           
@@ -144,6 +148,17 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  }
+
+  <!-- Lightbox pour afficher l'image en plein écran -->
+  @if (lightboxImage()) {
+    <div class="lightbox-overlay" (click)="closeLightbox()">
+      <button class="lightbox-close" (click)="closeLightbox()">×</button>
+      <div class="lightbox-content" (click)="$event.stopPropagation()">
+        <img [src]="lightboxImage()!.url" [alt]="lightboxImage()!.title" class="lightbox-image">
+        <div class="lightbox-title">{{ lightboxImage()!.title }}</div>
       </div>
     </div>
   }

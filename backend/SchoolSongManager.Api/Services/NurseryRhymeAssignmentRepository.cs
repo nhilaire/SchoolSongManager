@@ -12,10 +12,19 @@ public class NurseryRhymeAssignmentRepository
 
     public NurseryRhymeAssignmentRepository(IConfiguration configuration)
     {
-        _dataDirectory = configuration.GetValue<string>("DataDirectory") ?? "data";
+        // Pour Azure Web App, le répertoire data est à la racine
+        var rootPath = configuration["DataPath"] ?? "/home/data";
+
+        // En développement local, utiliser un répertoire dans le projet
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            rootPath = Path.Combine(Directory.GetCurrentDirectory(), "data");
+        }
+
+        _dataDirectory = rootPath;
         _assignmentFilePath = Path.Combine(_dataDirectory, "nursery-rhyme-assignments.json");
         _nurseryRhymesFilePath = Path.Combine(_dataDirectory, "nursery-rhymes.json");
-        
+
         EnsureDataDirectoryExists();
         EnsureAssignmentFileExists();
     }

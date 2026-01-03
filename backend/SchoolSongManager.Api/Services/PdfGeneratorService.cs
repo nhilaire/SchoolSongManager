@@ -21,8 +21,18 @@ public class PdfGeneratorService : IPdfGeneratorService
     {
         _environment = environment;
         _configuration = configuration;
-        _dataDirectory = _configuration.GetValue<string>("DataDirectory") ?? "data";
-        
+
+        // Pour Azure Web App, le répertoire data est à la racine
+        var rootPath = configuration["DataPath"] ?? "/home/data";
+
+        // En développement local, utiliser un répertoire dans le projet
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            rootPath = Path.Combine(Directory.GetCurrentDirectory(), "data");
+        }
+
+        _dataDirectory = rootPath;
+
         // Configuration de QuestPDF (licence community)
         QuestPDF.Settings.License = LicenseType.Community;
     }
@@ -82,15 +92,9 @@ public class PdfGeneratorService : IPdfGeneratorService
             {
                 if (!string.IsNullOrEmpty(nurseryRhyme.ImageFileName))
                 {
-                    // Chemin vers l'image
-                    var imagePath = Path.Combine(_environment.WebRootPath ?? _environment.ContentRootPath, "wwwroot", "images", "nursery-rhymes", nurseryRhyme.ImageFileName);
-                    
-                    // Alternative: essayer aussi le chemin direct dans le dossier data
-                    if (!File.Exists(imagePath))
-                    {
-                        imagePath = Path.Combine(_dataDirectory, "images", nurseryRhyme.ImageFileName);
-                    }
-                    
+                    // Chemin vers l'image dans le dossier data/images
+                    var imagePath = Path.Combine(_dataDirectory, "images", nurseryRhyme.ImageFileName);
+
                     if (File.Exists(imagePath))
                     {
                         imageColumn.Item()
@@ -138,15 +142,9 @@ public class PdfGeneratorService : IPdfGeneratorService
             {
                 if (!string.IsNullOrEmpty(nurseryRhyme.ImageFileName))
                 {
-                    // Chemin vers l'image
-                    var imagePath = Path.Combine(_environment.WebRootPath ?? _environment.ContentRootPath, "wwwroot", "images", "nursery-rhymes", nurseryRhyme.ImageFileName);
-                    
-                    // Alternative: essayer aussi le chemin direct dans le dossier data
-                    if (!File.Exists(imagePath))
-                    {
-                        imagePath = Path.Combine(_dataDirectory, "images", nurseryRhyme.ImageFileName);
-                    }
-                    
+                    // Chemin vers l'image dans le dossier data/images
+                    var imagePath = Path.Combine(_dataDirectory, "images", nurseryRhyme.ImageFileName);
+
                     if (File.Exists(imagePath))
                     {
                         imageColumn.Item()
