@@ -201,6 +201,18 @@
                 border-color: #28a745;
               }
 
+              &.hide-recently-used {
+                background-color: #ffebee;
+                border-color: #f44336;
+                color: #d32f2f;
+
+                &.active {
+                  background-color: #f44336;
+                  border-color: #f44336;
+                  color: white;
+                }
+              }
+
               // Styles pour les filtres d'années
               &.year-filter {
                 background-color: #e8f4fd;
@@ -383,13 +395,20 @@
               .rhyme-content {
                 flex: 1;
 
+                .rhyme-header-row {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-start;
+                  gap: 8px;
+                  margin-bottom: 10px;
+                  padding-right: 30px; // Espace pour la coche
+                }
+
                 .rhyme-title {
                   font-weight: 600;
                   font-size: 16px;
                   color: #333;
-                  margin-bottom: 10px;
-                  display: block;
-                  padding-right: 35px; // Espace pour la coche
+                  flex: 1;
                 }
 
                 .rhyme-themes {
@@ -526,6 +545,125 @@
   }
 }
 
+// Boutons d'action sur les cartes (dans le header)
+.rhyme-actions-buttons {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+
+  .action-btn {
+    padding: 4px 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    &.image-btn {
+      border-color: #17a2b8;
+
+      &:hover {
+        background-color: #e7f5f7;
+        border-color: #138496;
+      }
+    }
+
+    &.audio-btn {
+      border-color: #28a745;
+
+      &:hover {
+        background-color: #e8f5e9;
+        border-color: #1e7e34;
+      }
+
+      &.playing {
+        background-color: #ffc107;
+        border-color: #e0a800;
+        animation: pulse 1s infinite;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+// Lightbox
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  cursor: pointer;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2.5rem;
+  cursor: pointer;
+  z-index: 2001;
+  line-height: 1;
+  padding: 8px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+
+  &:hover {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+.lightbox-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 90vw;
+  max-height: 90vh;
+  cursor: default;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-title {
+  color: white;
+  font-size: 1.2rem;
+  margin-top: 15px;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
 @media (max-width: 768px) {
   .assignment-dashboard {
     padding: 15px;
@@ -543,5 +681,9 @@
         grid-template-columns: 1fr;
       }
     }
+  }
+
+  .rhyme-actions-buttons {
+    justify-content: center;
   }
 }

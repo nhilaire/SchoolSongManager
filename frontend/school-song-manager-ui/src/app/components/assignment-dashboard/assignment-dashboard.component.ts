@@ -40,6 +40,11 @@ export class AssignmentDashboardComponent implements OnInit {
   selectedPeriods = signal<string[]>([]);
   selectedThemes = signal<string[]>([]);
 
+  // Lightbox et audio
+  lightboxImage = signal<{ url: string; title: string } | null>(null);
+  currentlyPlayingId = signal<string | null>(null);
+  private audioElement: HTMLAudioElement | null = null;
+
   // Expose constants to template
   schoolPeriods = SCHOOL_PERIODS;
   periodLabels = PERIOD_LABELS;
@@ -323,33 +328,47 @@ export class AssignmentDashboardComponent implements OnInit {
     } else {
       result = allRhymes.filter(rhyme => {
         const history = this.getAssignmentHistory(rhyme.id);
+        const isRecentlyUsed = this.isRecentlyUsed(rhyme.id);
 
-        // Si le filtre "jamais utilisées" est sélectionné et que la comptine n'a pas d'historique
-        if (filters.includes('never-used') && history.length === 0) {
-          // Vérifier aussi les filtres de thèmes même pour les comptines jamais utilisées
-          if (selectedThemes.length > 0) {
-            return rhyme.themeIds.some(themeId => selectedThemes.includes(themeId));
-          }
-          return true;
-        }
+        // Filtre "jamais utilisées" - comptines sans aucun historique
+        const neverUsedFilter = filters.includes('never-used');
+        // Filtre "masquer les déjà utilisées" - masque les comptines utilisées récemment (en rouge)
+        const hideRecentlyUsedFilter = filters.includes('hide-recently-used');
 
-        // Si la comptine n'a pas d'historique et que d'autres filtres sont actifs (hors thèmes)
-        if (history.length === 0 && (selectedYears.length > 0 || selectedPeriods.length > 0)) {
+        // Si le filtre "jamais utilisées" est actif, n'afficher que les comptines sans historique
+        if (neverUsedFilter && history.length > 0) {
           return false;
         }
 
-        // Vérifier les filtres d'années
-        const yearMatch = selectedYears.length === 0 || history.some(h => selectedYears.includes(h.year));
+        // Si le filtre "masquer les déjà utilisées" est actif, masquer les comptines récemment utilisées
+        if (hideRecentlyUsedFilter && isRecentlyUsed) {
+          return false;
+        }
 
-        // Vérifier les filtres de périodes
-        const periodMatch = selectedPeriods.length === 0 || history.some(h =>
-          h.periods.some(period => selectedPeriods.includes(period))
-        );
+        // Si les deux filtres sont inactifs mais qu'on filtre par année/période
+        if (!neverUsedFilter && !hideRecentlyUsedFilter) {
+          // Si la comptine n'a pas d'historique et que des filtres année/période sont actifs
+          if (history.length === 0 && (selectedYears.length > 0 || selectedPeriods.length > 0)) {
+            return false;
+          }
 
-        // Vérifier les filtres de thèmes
+          // Vérifier les filtres d'années
+          const yearMatch = selectedYears.length === 0 || history.some(h => selectedYears.includes(h.year));
+
+          // Vérifier les filtres de périodes
+          const periodMatch = selectedPeriods.length === 0 || history.some(h =>
+            h.periods.some(period => selectedPeriods.includes(period))
+          );
+
+          if (!yearMatch || !periodMatch) {
+            return false;
+          }
+        }
+
+        // Vérifier les filtres de thèmes (s'applique toujours)
         const themeMatch = selectedThemes.length === 0 || rhyme.themeIds.some(themeId => selectedThemes.includes(themeId));
 
-        return yearMatch && periodMatch && themeMatch;
+        return themeMatch;
       });
     }
 
@@ -361,14 +380,30 @@ export class AssignmentDashboardComponent implements OnInit {
     return this.allThemes().find(theme => theme.id === themeId);
   }
 
+  // Retourne l'année scolaire courante (ex: si on est en janvier 2026, c'est 2025/2026)
+  private getCurrentSchoolYear(): number {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0 = janvier
+
+    // L'année scolaire commence en septembre (mois 8)
+    // Si on est entre janvier et août, on est dans l'année scolaire qui a commencé l'année précédente
+    if (currentMonth < 8) {
+      return currentYear - 1;
+    }
+    return currentYear;
+  }
+
   isRecentlyUsed(nurseryRhymeId: string): boolean {
     const history = this.getAssignmentHistory(nurseryRhymeId);
     if (history.length === 0) {
       return false;
     }
 
-    const currentYear = new Date().getFullYear();
-    const twoYearsAgo = currentYear - 2;
+    // Année scolaire courante (ex: 2025 pour 2025/2026)
+    const currentSchoolYear = this.getCurrentSchoolYear();
+    // On considère comme "récemment utilisée" les 2 dernières années scolaires
+    const twoYearsAgo = currentSchoolYear - 2;
 
     return history.some(h => {
       // Extraire l'année de début de l'année scolaire (ex: "2023/2024" -> 2023)
@@ -380,5 +415,65 @@ export class AssignmentDashboardComponent implements OnInit {
 
   getCardBackgroundClass(nurseryRhymeId: string): string {
     return this.isRecentlyUsed(nurseryRhymeId) ? 'recently-used' : 'not-recently-used';
+  }
+
+  // Lightbox
+  openLightbox(rhyme: NurseryRhyme): void {
+    if (rhyme.imageFileName) {
+      this.lightboxImage.set({
+        url: this.getImageUrl(rhyme.imageFileName),
+        title: rhyme.title
+      });
+    }
+  }
+
+  closeLightbox(): void {
+    this.lightboxImage.set(null);
+  }
+
+  // Audio
+  isPlaying(rhymeId: string): boolean {
+    return this.currentlyPlayingId() === rhymeId;
+  }
+
+  toggleAudio(rhyme: NurseryRhyme): void {
+    if (!rhyme.audioFileName) return;
+
+    // Si on joue déjà cette comptine, on arrête
+    if (this.currentlyPlayingId() === rhyme.id) {
+      this.stopAudio();
+      return;
+    }
+
+    // Arrêter l'audio en cours s'il y en a un
+    this.stopAudio();
+
+    // Créer et jouer le nouvel audio
+    const audioUrl = this.nurseryRhymeService.getAudioUrl(rhyme.audioFileName);
+    this.audioElement = new Audio(audioUrl);
+    this.currentlyPlayingId.set(rhyme.id);
+
+    this.audioElement.play();
+
+    // Quand l'audio se termine, réinitialiser l'état
+    this.audioElement.onended = () => {
+      this.currentlyPlayingId.set(null);
+      this.audioElement = null;
+    };
+
+    // En cas d'erreur
+    this.audioElement.onerror = () => {
+      this.currentlyPlayingId.set(null);
+      this.audioElement = null;
+    };
+  }
+
+  private stopAudio(): void {
+    if (this.audioElement) {
+      this.audioElement.pause();
+      this.audioElement.currentTime = 0;
+      this.audioElement = null;
+    }
+    this.currentlyPlayingId.set(null);
   }
 }

@@ -11,9 +11,27 @@
   @if (error()) {
     <div class="error-message">{{ error() }}</div>
   }
-  
+
+  <!-- Barre de recherche -->
+  <div class="search-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Rechercher une comptine..."
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)">
+      @if (searchQuery()) {
+        <button class="clear-search" (click)="searchQuery.set('')">×</button>
+      }
+    </div>
+    <div class="search-results-count">
+      {{ filteredRhymes().length }} comptine(s) sur {{ nurseryRhymes().length }}
+    </div>
+  </div>
+
   <div class="rhymes-grid">
-    @for (rhyme of nurseryRhymes(); track rhyme.id) {
+    @for (rhyme of filteredRhymes(); track rhyme.id) {
       <div class="rhyme-card">
         <div class="rhyme-header">
           <h3>{{ rhyme.title }}</h3>

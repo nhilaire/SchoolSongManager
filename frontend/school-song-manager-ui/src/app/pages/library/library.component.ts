@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NurseryRhymeService, NurseryRhyme } from '../../services/nursery-rhyme.service';
@@ -24,7 +24,22 @@ export class LibraryComponent implements OnInit {
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly selectedImageFile = signal<File | null>(null);
   protected readonly lightboxImage = signal<{ url: string; title: string } | null>(null);
-  
+
+  // Recherche
+  protected readonly searchQuery = signal<string>('');
+  protected readonly filteredRhymes = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const rhymes = this.nurseryRhymes();
+
+    if (!query) {
+      return rhymes;
+    }
+
+    return rhymes.filter(rhyme =>
+      rhyme.title.toLowerCase().includes(query)
+    );
+  });
+
   private nurseryRhymeService = inject(NurseryRhymeService) as NurseryRhymeService;
   private themeService = inject(ThemeService) as ThemeService;
   private formBuilder = inject(FormBuilder) as FormBuilder;

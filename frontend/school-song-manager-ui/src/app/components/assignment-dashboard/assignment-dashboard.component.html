@@ -117,13 +117,21 @@
           </div>
           
           <div class="filter-group">
-            <label>Jamais utilisées :</label>
-            <button 
-              class="filter-chip never-used" 
-              [class.active]="selectedFilters().includes('never-used')"
-              (click)="toggleFilter('never-used')">
-              Jamais utilisées
-            </button>
+            <label>Statut d'utilisation :</label>
+            <div class="chips-container">
+              <button
+                class="filter-chip never-used"
+                [class.active]="selectedFilters().includes('never-used')"
+                (click)="toggleFilter('never-used')">
+                Jamais utilisées
+              </button>
+              <button
+                class="filter-chip hide-recently-used"
+                [class.active]="selectedFilters().includes('hide-recently-used')"
+                (click)="toggleFilter('hide-recently-used')">
+                Masquer les déjà utilisées
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -141,8 +149,31 @@
                 <i class="fas fa-check"></i>
               </div>
               <div class="rhyme-content">
-                <div class="rhyme-title">{{ rhyme.title }}</div>
-                
+                <div class="rhyme-header-row">
+                  <div class="rhyme-title">{{ rhyme.title }}</div>
+                  <div class="rhyme-actions-buttons">
+                    @if (rhyme.imageFileName) {
+                      <button
+                        type="button"
+                        class="action-btn image-btn"
+                        (click)="openLightbox(rhyme); $event.stopPropagation()"
+                        title="Voir l'image">
+                        🖼️
+                      </button>
+                    }
+                    @if (rhyme.audioFileName) {
+                      <button
+                        type="button"
+                        class="action-btn audio-btn"
+                        [class.playing]="isPlaying(rhyme.id)"
+                        (click)="toggleAudio(rhyme); $event.stopPropagation()"
+                        [title]="isPlaying(rhyme.id) ? 'Arrêter' : 'Écouter'">
+                        {{ isPlaying(rhyme.id) ? '⏹️' : '🔊' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+
                 <!-- Affichage des thèmes -->
                 <div class="rhyme-themes" *ngIf="rhyme.themeIds && rhyme.themeIds.length > 0">
                   @for (themeId of rhyme.themeIds; track themeId) {
@@ -173,6 +204,7 @@
                     <div class="no-history">Jamais utilisée</div>
                   }
                 </div>
+
               </div>
             </div>
           </label>
@@ -201,4 +233,15 @@
       {{ generationMessage() }}
     </div>
   </div>
+
+  <!-- Lightbox pour afficher l'image en plein écran -->
+  @if (lightboxImage()) {
+    <div class="lightbox-overlay" (click)="closeLightbox()">
+      <button class="lightbox-close" (click)="closeLightbox()">×</button>
+      <div class="lightbox-content" (click)="$event.stopPropagation()">
+        <img [src]="lightboxImage()!.url" [alt]="lightboxImage()!.title" class="lightbox-image">
+        <div class="lightbox-title">{{ lightboxImage()!.title }}</div>
+      </div>
+    </div>
+  }
 </div>
