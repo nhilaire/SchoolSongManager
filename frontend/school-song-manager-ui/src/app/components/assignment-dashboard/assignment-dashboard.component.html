@@ -24,9 +24,10 @@
       <div class="form-row">
         <div class="form-group">
           <label for="target-year">Année scolaire :</label>
-          <select 
+          <select
             id="target-year"
             [(ngModel)]="targetSchoolYear"
+            (ngModelChange)="onYearOrPeriodChange()"
             class="form-select">
             <option value="">Sélectionnez une année</option>
             <option *ngFor="let year of schoolYears()" [value]="year">{{ year }}</option>
@@ -37,12 +38,13 @@
           <label>Période :</label>
           <div class="radio-group">
             <div *ngFor="let period of schoolPeriods" class="radio-item">
-              <input 
-                type="radio" 
+              <input
+                type="radio"
                 [id]="'period-' + period"
-                name="targetPeriod" 
+                name="targetPeriod"
                 [value]="period"
-                [(ngModel)]="targetPeriod">
+                [(ngModel)]="targetPeriod"
+                (ngModelChange)="onYearOrPeriodChange()">
               <label [for]="'period-' + period">{{ period }} - {{ getPeriodLabel(period) }}</label>
             </div>
           </div>

@@ -87,6 +87,22 @@ export class AssignmentDashboardComponent implements OnInit {
     return this.periodLabels[period as SchoolPeriod] || period;
   }
 
+  // Pré-sélectionner les comptines déjà assignées pour l'année/période choisie
+  onYearOrPeriodChange(): void {
+    if (!this.targetSchoolYear || !this.targetPeriod) {
+      return;
+    }
+
+    // Trouver les comptines déjà assignées pour cette combinaison année/période
+    const existingAssignments = this.allAssignments().filter(
+      a => a.schoolYear === this.targetSchoolYear && a.period === this.targetPeriod
+    );
+
+    // Pré-sélectionner ces comptines
+    const assignedRhymeIds = existingAssignments.map(a => a.nurseryRhymeId);
+    this.selectedRhymeIds.set(assignedRhymeIds);
+  }
+
   // Méthodes pour la sélection des comptines
   isRhymeSelected(rhymeId: string): boolean {
     return this.selectedRhymeIds().includes(rhymeId);
